@@ -33,8 +33,6 @@ fun ProfileScreen(
     var editedAge by remember { mutableStateOf("") }
     var editedGender by remember { mutableStateOf("") }
 
-    var isDarkMode by remember { mutableStateOf(false) }
-
     LaunchedEffect(uid) {
         if (uid != null) {
             firestore.collection("users").document(uid).get()
@@ -55,113 +53,107 @@ fun ProfileScreen(
         }
     }
 
-    val themeColors = if (isDarkMode) darkColorScheme() else lightColorScheme()
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 24.dp, vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Text("👤 Profile", style = MaterialTheme.typography.headlineMedium)
 
-    MaterialTheme(colorScheme = themeColors) {
-        Surface(modifier = Modifier.fillMaxSize()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Text("👤 Profile", style = MaterialTheme.typography.headlineMedium)
-
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    elevation = CardDefaults.cardElevation(4.dp)
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        if (isEditing) {
-                            OutlinedTextField(
-                                value = editedFirstName,
-                                onValueChange = { editedFirstName = it },
-                                label = { Text("First Name") },
-                                modifier = Modifier.fillMaxWidth()
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            elevation = CardDefaults.cardElevation(4.dp)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                if (isEditing) {
+                    OutlinedTextField(
+                        value = editedFirstName,
+                        onValueChange = { editedFirstName = it },
+                        label = { Text("First Name") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = editedLastName,
+                        onValueChange = { editedLastName = it },
+                        label = { Text("Last Name") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = editedAge,
+                        onValueChange = { editedAge = it.filter { c -> c.isDigit() } },
+                        label = { Text("Age") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Text("Gender")
+                    listOf("Male", "Female", "Other").forEach { option ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            RadioButton(
+                                selected = editedGender == option,
+                                onClick = { editedGender = option }
                             )
-                            OutlinedTextField(
-                                value = editedLastName,
-                                onValueChange = { editedLastName = it },
-                                label = { Text("Last Name") },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            OutlinedTextField(
-                                value = editedAge,
-                                onValueChange = { editedAge = it.filter { c -> c.isDigit() } },
-                                label = { Text("Age") },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            Text("Gender")
-                            listOf("Male", "Female", "Other").forEach { option ->
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    RadioButton(
-                                        selected = editedGender == option,
-                                        onClick = { editedGender = option }
-                                    )
-                                    Text(option)
-                                }
-                            }
-
-                            Button(
-                                onClick = {
-                                    val updatedData = mapOf(
-                                        "firstname" to editedFirstName,
-                                        "lastname" to editedLastName,
-                                        "age" to editedAge.toIntOrNull(),
-                                        "gender" to editedGender
-                                    )
-                                    uid?.let {
-                                        firestore.collection("users").document(it).update(updatedData)
-                                            .addOnSuccessListener {
-                                                firstname = editedFirstName
-                                                lastname = editedLastName
-                                                age = editedAge.toIntOrNull() ?: age
-                                                gender = editedGender
-                                                isEditing = false
-                                            }
-                                    }
-                                },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text("Save Changes")
-                            }
-                        } else {
-                            ProfileRow(Icons.Default.Person, "Name", "$firstname $lastname")
-                            ProfileRow(Icons.Default.Cake, "Age", "$age")
-                            ProfileRow(Icons.Default.Wc, "Gender", gender)
-                            ProfileRow(Icons.Default.Email, "Email", email)
-
-                            Button(
-                                onClick = { isEditing = true },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text("Edit Profile")
-                            }
+                            Text(option)
                         }
                     }
-                }
 
-                Divider()
+                    Button(
+                        onClick = {
+                            val updatedData = mapOf(
+                                "firstname" to editedFirstName,
+                                "lastname" to editedLastName,
+                                "age" to editedAge.toIntOrNull(),
+                                "gender" to editedGender
+                            )
+                            uid?.let {
+                                firestore.collection("users").document(it).update(updatedData)
+                                    .addOnSuccessListener {
+                                        firstname = editedFirstName
+                                        lastname = editedLastName
+                                        age = editedAge.toIntOrNull() ?: age
+                                        gender = editedGender
+                                        isEditing = false
+                                    }
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Save Changes")
+                    }
+                } else {
+                    ProfileRow(Icons.Default.Person, "Name", "$firstname $lastname")
+                    ProfileRow(Icons.Default.Cake, "Age", "$age")
+                    ProfileRow(Icons.Default.Wc, "Gender", gender)
+                    ProfileRow(Icons.Default.Email, "Email", email)
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text("Dark Mode")
-                    Switch(
-                        checked = isDarkMode,
-                        onCheckedChange = { isDarkMode = it }
-                    )
-                }
-
-                Button(
-                    onClick = onLogout,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Logout")
+                    Button(
+                        onClick = { isEditing = true },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Edit Profile")
+                    }
                 }
             }
+        }
+
+        Divider()
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text("Dark Mode")
+            Switch(
+                checked = isDarkMode,
+                onCheckedChange = { onToggleTheme(it) }
+            )
+        }
+
+        Button(
+            onClick = onLogout,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Logout")
         }
     }
 }

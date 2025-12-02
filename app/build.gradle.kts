@@ -75,6 +75,17 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-analytics")
+    implementation("androidx.datastore:datastore-preferences:1.2.0")
+    //API
+// Retrofit for networking
+    implementation("com.squareup.retrofit2:retrofit:3.0.0")
+// Gson converter for JSON parsing
+    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
+// (Optional but recommended) OkHttp logging interceptor for debugging API calls
+    implementation("com.squareup.okhttp3:logging-interceptor:5.3.2")
+// Coroutines for async calls
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
 
 
 

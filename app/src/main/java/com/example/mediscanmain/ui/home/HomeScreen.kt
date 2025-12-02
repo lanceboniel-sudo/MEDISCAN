@@ -10,7 +10,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.mediscanmain.data.AppDatabase
 import com.example.mediscanmain.model.ScanEntity
-import com.example.mediscanmain.ui.components.BottomBar
 import kotlinx.coroutines.flow.collectLatest
 import java.text.SimpleDateFormat
 import java.util.*
